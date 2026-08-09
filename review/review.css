@@ -443,81 +443,13 @@ body::before {
 
 .rf-regen-btn:active { transform: scale(0.96); }
 
-/* SAVE + ACTION ROW */
+/* ACTION ROW */
 .rf-action-row {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
 }
-
-.rf-save-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 11px 16px;
-  border: 1px dashed rgba(255, 255, 255, 0.18);
-  border-radius: 100px;
-  background: rgba(255, 255, 255, 0.03);
-  color: #cfcfcf;
-  font-family: var(--font-num);
-  font-size: 11.5px;
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.rf-save-btn:active { transform: scale(0.96); }
-
-.rf-save-btn.saved {
-  background: rgba(87, 217, 141, 0.1);
-  border-color: rgba(87, 217, 141, 0.35);
-  color: var(--good);
-}
-
-.rf-save-icon { font-size: 14px; }
-
-/* SAVED SECTION */
-.rf-savedsec { display: none; margin-top: 18px; }
-
-.rf-savedsec.show { display: block; }
-
-.rf-saved-head {
-  font-family: var(--font-head);
-  font-weight: 900;
-  font-size: clamp(17px, 5vw, 20px);
-  color: var(--gold);
-  margin-bottom: 12px;
-}
-
-.rf-saved-item { gap: 10px; }
-
-.rf-saved-text {
-  font-size: 14px;
-  line-height: 1.65;
-  color: #e2e2e2;
-  word-break: break-word;
-}
-
-.rf-saved-del {
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid rgba(255, 107, 107, 0.3);
-  color: var(--bad);
-  font-size: 13px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.rf-saved-del:active { transform: scale(0.9); }
-
-.rf-saved-copy { padding: 9px 16px; font-size: 11px; }
 
 /* FOOTER */
 .rf-foot { text-align: center; padding: 26px 10px 6px; }

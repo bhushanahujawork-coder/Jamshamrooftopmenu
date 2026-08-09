@@ -127,8 +127,6 @@
 
         '<section class="rf-results" id="rf-results"></section>' +
 
-        '<section class="rf-savedsec" id="rfSavedSec"></section>' +
-
         '<footer class="rf-foot">' +
           '<p class="rf-privacy">No personal details are collected. Reviews are posted by you, on Google.</p>' +
           '<p class="rf-credit">' + business.name + ' · ' + business.location + '</p>' +
@@ -293,19 +291,6 @@
     return list;
   }
 
-  function loadSavedReviews() {
-    try {
-      var raw = localStorage.getItem('jsr_saved_reviews');
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) { return []; }
-  }
-
-  function saveSavedReviews(list) {
-    try {
-      localStorage.setItem('jsr_saved_reviews', JSON.stringify(list.slice(-40)));
-    } catch (e) {}
-  }
-
   function templateReviews(ctx) {
     var out = [];
     ctx.items = business.menuItems || [];
@@ -396,22 +381,6 @@
 
       var action = el('div', 'rf-review-action');
       var actionRow = el('div', 'rf-action-row');
-      var saveBtn = el('button', 'rf-save-btn',
-        '<span class="rf-save-icon">💾</span><span class="rf-save-label">Save</span>');
-      saveBtn.type = 'button';
-
-      function saveReview() {
-        var val = ta.value.trim() || text;
-        var saved = loadSavedReviews();
-        saved.push({ text: val, rating: state.rating, language: LANGS_ORDER[idx], business: business.id, savedAt: Date.now() });
-        saveSavedReviews(saved);
-        saveBtn.classList.add('saved');
-        saveBtn.querySelector('.rf-save-label').textContent = 'Saved ✓';
-        JSR_Analytics.track('review_saved', { index: idx, language: LANGS_ORDER[idx] });
-        toast('Review saved on this device 💾', 2400);
-      }
-      saveBtn.addEventListener('click', saveReview);
-      actionRow.appendChild(saveBtn);
 
       var copyBtn = el('button', 'rf-copy-btn',
         '<span class="rf-copy-icon">⭐</span><span class="rf-copy-label">Post Review on Google</span>');
@@ -481,85 +450,11 @@
     ta.style.height = (ta.scrollHeight + 2) + 'px';
   }
 
-  function renderSavedSec() {
-    var sec = document.getElementById('rfSavedSec');
-    if (!sec) return;
-    var list = loadSavedReviews().filter(function (r) { return r.business === business.id; });
-    if (!list.length) {
-      sec.innerHTML = '';
-      sec.classList.remove('show');
-      return;
-    }
-    var items = '';
-    list.forEach(function (r, i) {
-      var lbl = window.JSR_TEMPLATES.languageName[r.language] || r.language;
-      var emo = { en: '🌍', hg: '💬' }[r.language] || '';
-      items +=
-        '<div class="rf-card rf-saved-item">' +
-          '<div class="rf-review-top">' +
-            '<span class="rf-lang-badge"><span class="rf-badge-stars">' + r.rating + ' ★</span>' + emo + ' ' + lbl + '</span>' +
-            '<button class="rf-saved-del" data-i="' + i + '" type="button" aria-label="Delete">🗑</button>' +
-          '</div>' +
-          '<p class="rf-saved-text"></p>' +
-          '<div class="rf-action-row">' +
-            '<button class="rf-copy-btn rf-saved-copy" data-i="' + i + '" type="button"><span class="rf-copy-icon">📋</span><span class="rf-copy-label">Copy</span></button>' +
-          '</div>' +
-        '</div>';
-    });
-    sec.innerHTML =
-      '<div class="rf-saved-head">💾 Saved reviews on this device</div>' + items;
-    sec.classList.add('show');
-
-    sec.querySelectorAll('.rf-saved-text').forEach(function (p, i) {
-      p.textContent = list[i].text;
-    });
-
-    sec.querySelectorAll('.rf-saved-copy').forEach(function (btn, i) {
-      btn.addEventListener('click', function () {
-        var txt = list[i].text;
-        var fallback = function () {
-          try {
-            var temp = document.createElement('textarea');
-            temp.value = txt;
-            temp.style.position = 'fixed';
-            temp.style.opacity = '0';
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-          } catch (e) {}
-        };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(txt).then(function () {
-            btn.querySelector('.rf-copy-label').textContent = 'Copied ✓';
-            setTimeout(function () { btn.querySelector('.rf-copy-label').textContent = 'Copy'; }, 1600);
-          }).catch(fallback);
-        } else {
-          fallback();
-          btn.querySelector('.rf-copy-label').textContent = 'Copied ✓';
-          setTimeout(function () { btn.querySelector('.rf-copy-label').textContent = 'Copy'; }, 1600);
-        }
-        JSR_Analytics.track('saved_review_copied', { index: i });
-      });
-    });
-
-    sec.querySelectorAll('.rf-saved-del').forEach(function (btn, i) {
-      btn.addEventListener('click', function () {
-        var updated = loadSavedReviews();
-        updated.splice(i, 1);
-        saveSavedReviews(updated);
-        renderSavedSec();
-        toast('Saved review delete ho gaya 🗑', 2000);
-      });
-    });
-  }
-
   function init() {
     render();
     buildStars();
     paintStars();
     loadSession();
-    renderSavedSec();
     fetchOwnerReviews();
     JSR_Analytics.track('page_visit', { business: business.id, generationCount: state.genCount });
     if (state.genCount >= business.maxGenerations) {
