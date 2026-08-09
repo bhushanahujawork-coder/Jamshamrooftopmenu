@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/jamshamreview", "destination": "/jamshamreview.html" },
+    { "source": "/jamshamrooftopreview", "destination": "/jamshamrooftopreview.html" },
+    { "source": "/owner", "destination": "/owner.html" }
+  ]
+}

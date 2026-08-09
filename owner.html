@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Owner Panel — JamSham Reviews</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#060606">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700;900&family=Montserrat:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060606; --bg2: #0d0d10;
+  --card: rgba(20, 20, 24, 0.85);
+  --gold: #f3c75f; --gold2: #e6b800;
+  --gold-soft: rgba(243, 199, 95, 0.12);
+  --gold-line: rgba(243, 199, 95, 0.28);
+  --text: #e8e8e8; --muted: #9a9a9a; --dim: #6a6a6a;
+  --good: #57d98d; --bad: #ff6b6b;
+  --radius: 16px;
+  --font: 'Poppins', system-ui, sans-serif;
+  --font-head: 'Playfair Display', Georgia, serif;
+  --font-num: 'Montserrat', var(--font);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: var(--font); min-height: 100dvh;
+  background:
+    radial-gradient(1100px 480px at 50% -12%, rgba(243, 199, 95, 0.09), transparent 65%),
+    var(--bg);
+}
+.wrap { max-width: 640px; margin: 0 auto; padding: 24px 18px calc(32px + env(safe-area-inset-bottom)); }
+header { text-align: center; margin-bottom: 22px; }
+h1 { font-family: var(--font-head); font-weight: 900; font-size: 26px; color: var(--gold); }
+.sub { font-size: 12.5px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+.card {
+  background: var(--card); border: 1px solid var(--gold-line);
+  border-radius: var(--radius); padding: 18px; margin-bottom: 16px;
+}
+.card h2 { font-family: var(--font-num); font-size: 13px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); margin: 10px 0 4px; letter-spacing: 0.4px; }
+select, textarea, input {
+  width: 100%; background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--gold-line); border-radius: 10px;
+  color: #e2e2e2; font-family: var(--font); font-size: 13.5px; padding: 10px 12px; outline: none;
+}
+select:focus, textarea:focus, input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(243, 199, 95, 0.1); }
+textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 12px 20px; border: none; border-radius: 100px; cursor: pointer;
+  font-family: var(--font-num); font-size: 12.5px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;
+  transition: all 0.18s ease;
+}
+.btn-gold { background: linear-gradient(120deg, var(--gold2), var(--gold), #fff3c4); color: #0a0a0a; box-shadow: 0 8px 22px rgba(243, 199, 95, 0.3); }
+.btn:active { transform: scale(0.96); }
+.btn-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.btn-line { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #d8d8d8; }
+.btn-danger { background: rgba(255, 107, 107, 0.12); border: 1px solid rgba(255, 107, 107, 0.35); color: var(--bad); }
+.btn-green { background: rgba(87, 217, 141, 0.12); border: 1px solid rgba(87, 217, 141, 0.35); color: var(--good); }
+.badge { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-num); font-size: 9.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); background: var(--gold-soft); border: 1px solid var(--gold-line); padding: 3px 9px; border-radius: 100px; }
+.rev { border: 1px solid rgba(255, 255, 255, 0.09); background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+.rev-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.rev-text { font-size: 13.5px; line-height: 1.6; color: #ddd; white-space: pre-wrap; word-break: break-word; }
+.rev-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.rev-actions .btn { padding: 7px 14px; font-size: 11px; }
+.rev textarea, .rev .rev-edit-selects { display: none; margin-top: 8px; }
+.rev.editing textarea, .rev.editing .rev-edit-selects { display: block; }
+.rev.editing .rev-text { display: none; }
+.empty { text-align: center; color: var(--dim); font-size: 12.5px; padding: 18px 10px; }
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 20px);
+  background: rgba(20, 20, 24, 0.96); border: 1px solid var(--gold-line); color: var(--gold);
+  font-family: var(--font-num); font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 12px 20px; border-radius: 100px; opacity: 0; visibility: hidden;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 300;
+  max-width: calc(100vw - 48px); text-align: center; pointer-events: none;
+}
+.toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.note { font-size: 11.5px; color: var(--dim); line-height: 1.6; margin-top: 10px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.stat { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 12px; padding: 12px; text-align: center; }
+.stat b { display: block; font-family: var(--font-num); font-size: 20px; color: var(--gold); }
+.stat span { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.7px; font-weight: 700; }
+.stars-mini { color: var(--gold); letter-spacing: 2px; font-size: 12px; }
+.filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.filters .btn { padding: 8px 14px; font-size: 11px; }
+.filters .btn.active { background: var(--gold); color: #0a0a0a; border-color: var(--gold); }
+.check { display: flex; align-items: center; gap: 8px; margin: 12px 0 2px; font-size: 12px; color: var(--muted); cursor: pointer; }
+.check input { width: auto; }
+.login-box { max-width: 360px; margin: 8vh auto 0; text-align: center; }
+.login-box .lock { font-size: 40px; margin-bottom: 10px; }
+.logout { position: fixed; top: 16px; right: 16px; z-index: 50; }
+.logout .btn { padding: 8px 14px; font-size: 11px; }
+.seed-tag { font-size: 9px; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; }
+.rev-date { font-size: 10px; color: var(--dim); }
+.search { margin-bottom: 12px; }
+.edit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.edit-grid select { padding: 8px 10px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div id="loginView" class="wrap" style="display:none">
+  <div class="login-box">
+    <div class="lock">🔐</div>
+    <h1>Owner Login</h1>
+    <p class="sub">Owner panel khulne ke liye password daalo.<br>Password aap server pe set karte ho (OWNER_PASSWORD).</p>
+    <div class="card" style="margin-top:18px">
+      <label for="pw">Password</label>
+      <input type="password" id="pw" placeholder="Password...">
+      <div class="btn-row">
+        <button class="btn btn-gold" id="loginBtn" style="width:100%">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="dashView" class="wrap" style="display:none">
+  <div class="logout"><button class="btn btn-line" id="logoutBtn">Logout</button></div>
+  <header>
+    <h1>Owner Panel</h1>
+    <p class="sub">Asli customer reviews yahan manage karo — wo dono review pages pe <b>template reviews se pehle</b> customers ko dikhenge. Sab reviews server pe save rehte hain (data/reviews.json).</p>
+  </header>
+
+  <div class="card">
+    <h2>📊 Dashboard</h2>
+    <div class="stats">
+      <div class="stat"><b id="stTotal">0</b><span>Total</span></div>
+      <div class="stat"><b id="st5">0</b><span>5★</span></div>
+      <div class="stat"><b id="st45">0</b><span>4★</span></div>
+      <div class="stat"><b id="st3">0</b><span>3★</span></div>
+      <div class="stat"><b id="st2">0</b><span>2★</span></div>
+      <div class="stat"><b id="st1">0</b><span>1★</span></div>
+      <div class="stat"><b id="stVisits">0</b><span>Visits</span></div>
+      <div class="stat"><b id="stCopies">0</b><span>Copies</span></div>
+    </div>
+    <p class="note" id="analyticsNote" style="margin-top:12px">Analytics: rating taps, review generation, copies aur Google redirects — sab yahan count hote hain.</p>
+  </div>
+
+  <div class="card">
+    <h2>➕ Naya review add karo</h2>
+    <label for="oBiz">Business (kis review page pe dikhega)</label>
+    <select id="oBiz">
+      <option value="jamshamCafe">☕ JamSham Cafe  →  /jamshamreview</option>
+      <option value="jamshamRooftop">🌙 JamSham Rooftop  →  /jamshamrooftopreview</option>
+      <option value="both">Dono pages pe</option>
+    </select>
+    <label for="oRating">Rating</label>
+    <select id="oRating">
+      <option value="5">5 ★ Amazing</option>
+      <option value="4">4 ★ Good</option>
+      <option value="3">3 ★ Okay</option>
+      <option value="2">2 ★ Poor</option>
+      <option value="1">1 ★ Terrible</option>
+    </select>
+    <label for="oLang">Language</label>
+    <select id="oLang">
+      <option value="en">English 🌍</option>
+      <option value="hg">Hinglish 💬 (Hindi in English alphabets)</option>
+    </select>
+    <label for="oText">Review text (customer ka asli review)</label>
+    <textarea id="oText" maxlength="1200" placeholder="Yahan review likho ya paste karo..."></textarea>
+    <label class="check"><input type="checkbox" id="oEmoji" checked> Emoji automatically add karo (agar review me pehle se nahi hai)</label>
+    <div class="btn-row">
+      <button class="btn btn-gold" id="oAdd">💾 Save to pool</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📚 Sab reviews (<span id="oCount">0</span>)</h2>
+    <input class="search" id="oSearch" type="text" placeholder="🔍 Search reviews... (text me type karo)">
+    <div class="filters" id="oBizFilters"></div>
+    <div class="filters" id="oRatingFilters"></div>
+    <div id="oList"><div class="empty">Loading...</div></div>
+  </div>
+
+  <p class="note">💡 Tips:<br>
+  • Review kisi customer ne actually likha ho wo hi daalo — genuine reviews best hote hain.<br>
+  • Rating 4-5★ ke reviews sabse zyada darsaye jayenge (log mostly achhe experience pe hi aate hain).<br>
+  • Delete karne se sirf yahan se hatata hai — Google pe posted review par asar nahi hota.<br>
+  • Seed wale reviews sample hain (id "seed-...") — chaaho to delete kar do, naye apne daalo.<br>
+  • "👁 Preview" se dekh sakte ho customer ko review page pe kya dikhega.</p>
+</div>
+<div class="toast" id="oToast"></div>
+
+<script>
+(function () {
+  var TOKEN_KEY = 'jsr_owner_token';
+  var toastEl = document.getElementById('oToast');
+  var t;
+  var state = { data: null, bizFilter: 'all', ratingFilter: 'all', search: '' };
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(t);
+    t = setTimeout(function () { toastEl.classList.remove('show'); }, 2400);
+  }
+
+  function token() {
+    try { return sessionStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
+  }
+  function saveToken(tok) {
+    try { sessionStorage.setItem(TOKEN_KEY, tok); } catch (e) {}
+  }
+
+  function api(url, opts) {
+    opts = opts || {};
+    opts.headers = opts.headers || {};
+    opts.headers['Content-Type'] = 'application/json';
+    var tok = token();
+    if (tok) opts.headers['Authorization'] = 'Bearer ' + tok;
+    return fetch(url, opts).then(function (r) {
+      return r.json().catch(function () { return { ok: false }; }).then(function (data) {
+        if (!data.ok && r.status === 401) { logout(); }
+        return data;
+      });
+    });
+  }
+
+  function logout() {
+    try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {}
+    showLogin();
+  }
+
+  function showLogin() {
+    document.getElementById('dashView').style.display = 'none';
+    document.getElementById('loginView').style.display = 'block';
+    document.getElementById('pw').focus();
+  }
+  function showDash() {
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('dashView').style.display = 'block';
+    loadSummary();
+  }
+
+  function langName(l) { return l === 'hg' ? 'Hinglish 💬' : 'English 🌍'; }
+  function bizName(b) { return b === 'jamshamCafe' ? '☕ Cafe' : (b === 'jamshamRooftop' ? '🌙 Rooftop' : 'Dono'); }
+  function bizPath(b) { return b === 'jamshamRooftop' ? '/jamshamrooftopreview' : '/jamshamreview'; }
+  function fmtDate(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function EMOJI_BY_RATING(r) { return r >= 4 ? '😊' : (r === 3 ? '🙂' : '🙏'); }
+
+  function hasEmoji(s) {
+    return /[\u{1F300}-\u{1FAFF}\u2600-\u27BF\u2B00-\u2BFF\uFE0F]/u.test(s);
+  }
+
+  function loadSummary() {
+    api('/api/owner/summary').then(function (d) {
+      if (!d.ok) return;
+      state.data = d;
+      renderStats(d);
+      renderBizFilters(d);
+      renderRatingFilters();
+      renderList(d);
+    });
+  }
+
+  function renderStats(d) {
+    var c = d.counts;
+    document.getElementById('stTotal').textContent = c.total;
+    document.getElementById('st5').textContent = c.byRating[5] || 0;
+    document.getElementById('st45').textContent = c.byRating[4] || 0;
+    document.getElementById('st3').textContent = c.byRating[3] || 0;
+    document.getElementById('st2').textContent = c.byRating[2] || 0;
+    document.getElementById('st1').textContent = c.byRating[1] || 0;
+    var a = d.analytics || {};
+    document.getElementById('stVisits').textContent = a.byEvent && (a.byEvent.page_visit || 0);
+    var copies = (a.byEvent && (a.byEvent.copy_clicked || 0)) + (a.byEvent && (a.byEvent.saved_review_copied || 0));
+    document.getElementById('stCopies').textContent = copies;
+    document.getElementById('analyticsNote').textContent =
+      'Analytics (last 20k events): ' + (a.events || 0) + ' events total · page visits ' +
+      (a.byEvent && (a.byEvent.page_visit || 0)) + ' · ratings tapped ' +
+      (a.byEvent && (a.byEvent.rating_selected || 0)) + ' · suggestions generated ' +
+      (a.byEvent && (a.byEvent.review_generation || 0)) + ' · Google redirects ' +
+      (a.byEvent && (a.byEvent.google_redirect_clicked || 0)) + '.';
+  }
+
+  function renderBizFilters(d) {
+    var box = document.getElementById('oBizFilters');
+    box.innerHTML = '';
+    var opts = [
+      { v: 'all', l: 'Sab business' },
+      { v: 'jamshamCafe', l: '☕ Cafe' },
+      { v: 'jamshamRooftop', l: '🌙 Rooftop' }
+    ];
+    opts.forEach(function (o) {
+      var b = document.createElement('button');
+      b.className = 'btn btn-line' + (state.bizFilter === o.v ? ' active' : '');
+      b.textContent = o.l;
+      b.addEventListener('click', function () {
+        state.bizFilter = o.v;
+        renderBizFilters(d);
+        renderRatingFilters();
+        renderList(d);
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function renderRatingFilters() {
+    var box = document.getElementById('oRatingFilters');
+    box.innerHTML = '';
+    var opts = [
+      { v: 'all', l: '★ Sab' },
+      { v: '5', l: '5★' },
+      { v: '4', l: '4★' },
+      { v: '3', l: '3★' },
+      { v: '2', l: '2★' },
+      { v: '1', l: '1★' }
+    ];
+    opts.forEach(function (o) {
+      var b = document.createElement('button');
+      b.className = 'btn btn-line' + (state.ratingFilter === o.v ? ' active' : '');
+      b.textContent = o.l;
+      b.addEventListener('click', function () {
+        state.ratingFilter = o.v;
+        renderRatingFilters();
+        renderList(state.data);
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function filtered(d) {
+    var q = state.search.toLowerCase();
+    return d.reviews.filter(function (r) {
+      if (state.bizFilter !== 'all' && r.biz !== state.bizFilter) return false;
+      if (state.ratingFilter !== 'all' && String(r.rating) !== state.ratingFilter) return false;
+      if (q && r.text.toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+
+  function renderList(d) {
+    document.getElementById('oCount').textContent = d.reviews.length;
+    var list = filtered(d);
+    var box = document.getElementById('oList');
+    box.innerHTML = '';
+    if (!list.length) {
+      box.innerHTML = '<div class="empty">Is filter me koi review nahi — upar add karo ya filter badlo.</div>';
+      return;
+    }
+    list.forEach(function (r) {
+      var rev = document.createElement('div');
+      rev.className = 'rev';
+      rev.dataset.id = r.id;
+      var top = document.createElement('div');
+      top.className = 'rev-top';
+      var badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.innerHTML = '<span class="stars-mini">' + '★'.repeat(r.rating) + '</span> · ' + langName(r.language) + ' · ' + bizName(r.biz);
+      if (r.id && r.id.indexOf('seed-') === 0) badge.innerHTML += ' <span class="seed-tag">sample</span>';
+      top.appendChild(badge);
+      var date = document.createElement('span');
+      date.className = 'rev-date';
+      date.textContent = fmtDate(r.addedAt);
+      top.appendChild(date);
+      var txt = document.createElement('div');
+      txt.className = 'rev-text';
+      txt.textContent = r.text;
+      var editGrid = document.createElement('div');
+      editGrid.className = 'rev-edit-selects edit-grid';
+      var selBiz = document.createElement('select');
+      selBiz.innerHTML = '<option value="jamshamCafe">Cafe</option><option value="jamshamRooftop">Rooftop</option><option value="both">Dono</option>';
+      selBiz.value = r.biz;
+      var selRating = document.createElement('select');
+      selRating.innerHTML = '<option value="5">5★</option><option value="4">4★</option><option value="3">3★</option><option value="2">2★</option><option value="1">1★</option>';
+      selRating.value = String(r.rating);
+      var selLang = document.createElement('select');
+      selLang.innerHTML = '<option value="en">English</option><option value="hg">Hinglish</option>';
+      selLang.value = r.language;
+      editGrid.appendChild(selBiz);
+      editGrid.appendChild(selRating);
+      editGrid.appendChild(selLang);
+      var ta = document.createElement('textarea');
+      ta.maxLength = 1200;
+      ta.value = r.text;
+      var acts = document.createElement('div');
+      acts.className = 'rev-actions';
+      var editBtn = document.createElement('button');
+      editBtn.className = 'btn btn-line';
+      editBtn.textContent = '✏️ Edit';
+      var previewBtn = document.createElement('button');
+      previewBtn.className = 'btn btn-green';
+      previewBtn.textContent = '👁 Preview';
+      var delBtn = document.createElement('button');
+      delBtn.className = 'btn btn-danger';
+      delBtn.textContent = '🗑 Delete';
+      previewBtn.addEventListener('click', function () {
+        window.open(bizPath(r.biz), '_blank', 'noopener');
+      });
+      editBtn.addEventListener('click', function () {
+        var editing = rev.classList.toggle('editing');
+        editBtn.textContent = editing ? '💾 Save' : '✏️ Edit';
+        if (editing) { ta.focus(); return; }
+        var v = ta.value.trim();
+        if (v.length < 10) { toast('Review khaali nahi ho sakta'); rev.classList.add('editing'); editBtn.textContent = '💾 Save'; return; }
+        api('/api/owner/reviews', {
+          method: 'POST',
+          body: JSON.stringify({
+            id: r.id,
+            biz: selBiz.value,
+            rating: parseInt(selRating.value, 10),
+            language: selLang.value,
+            text: v
+          })
+        }).then(function (res) {
+          if (res.ok) { toast('Review updated ✅'); loadSummary(); }
+          else toast('Save fail hua');
+        });
+      });
+      delBtn.addEventListener('click', function () {
+        if (!confirm('Ye review delete karna hai?')) return;
+        api('/api/owner/reviews', {
+          method: 'DELETE',
+          body: JSON.stringify({ id: r.id, _delete: true })
+        }).then(function (res) {
+          if (res.ok) { toast('Review delete ho gaya 🗑'); loadSummary(); }
+          else toast('Delete fail hua');
+        });
+      });
+      acts.appendChild(editBtn);
+      acts.appendChild(previewBtn);
+      acts.appendChild(delBtn);
+      rev.appendChild(top);
+      rev.appendChild(txt);
+      rev.appendChild(editGrid);
+      rev.appendChild(ta);
+      rev.appendChild(acts);
+      box.appendChild(rev);
+    });
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', function () {
+    var pw = document.getElementById('pw').value.trim();
+    if (!pw) { toast('Password daalo'); return; }
+    fetch('/api/owner/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.ok && d.token) {
+        saveToken(d.token);
+        toast('Login successful ✅');
+        showDash();
+      } else {
+        toast('Galat password ❌');
+      }
+    }).catch(function () { toast('Server se connect nahi hua'); });
+  });
+
+  document.getElementById('pw').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+
+  document.getElementById('oSearch').addEventListener('input', function () {
+    state.search = this.value.trim();
+    if (state.data) renderList(state.data);
+  });
+
+  document.getElementById('oAdd').addEventListener('click', function () {
+    var text = document.getElementById('oText').value.trim();
+    if (text.length < 10) { toast('Review thoda lamba likho (min 10 characters)'); return; }
+    var emoji = document.getElementById('oEmoji').checked && !hasEmoji(text);
+    if (emoji) {
+      var rating = parseInt(document.getElementById('oRating').value, 10);
+      text += ' ' + EMOJI_BY_RATING(rating);
+    }
+    api('/api/owner/reviews', {
+      method: 'POST',
+      body: JSON.stringify({
+        biz: document.getElementById('oBiz').value,
+        rating: parseInt(document.getElementById('oRating').value, 10),
+        language: document.getElementById('oLang').value,
+        text: text
+      })
+    }).then(function (res) {
+      if (res.ok) {
+        document.getElementById('oText').value = '';
+        toast(emoji ? 'Review save ho gaya (emoji add kiya) ✅' : 'Review pool me save ho gaya ✅');
+        loadSummary();
+      } else {
+        toast(res.code === 'bad_review' ? 'Review 10-1200 characters me hona chahiye' : 'Save fail hua');
+      }
+    });
+  });
+
+  if (token()) showDash();
+  else showLogin();
+})();
+</script>
+</body>
+</html>
